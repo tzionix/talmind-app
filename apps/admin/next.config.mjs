@@ -53,13 +53,14 @@ const config = {
   typescript: { ignoreBuildErrors: true },
 };
 
-module.exports = config;
+export default config;
 
 function getRemotePatterns() {
   const remotePatterns = [];
 
   if (SUPABASE_URL) {
     const hostname = new URL(SUPABASE_URL).hostname;
+
     remotePatterns.push({
       protocol: 'https',
       hostname,
