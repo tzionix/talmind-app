@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFirestore, collection, query, where, getDocs } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
@@ -43,20 +42,32 @@ export default function ClientDashboard() {
   };
 
   return (
-    <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div style={{ padding: "20px", display: "grid", gap: "20px" }}>
       {proxies.map(proxy => (
-        <Card key={proxy.id} className="rounded-2xl shadow-md">
-          <CardContent className="p-4">
-            <h2 className="text-xl font-bold mb-2">Port: {proxy.port}</h2>
-            <p>Status: {proxy.is_active ? "Active" : "Inactive"}</p>
-            <button
-              onClick={() => toggleProxy(proxy.id, proxy.is_active)}
-              style={{ padding: "8px 16px", borderRadius: "8px", backgroundColor: "#333", color: "#fff", marginTop: "8px" }}
-            >
-              {proxy.is_active ? "Deactivate" : "Activate"}
-            </button>
-          </CardContent>
-        </Card>
+        <div key={proxy.id} style={{
+          border: "1px solid #ccc",
+          borderRadius: "16px",
+          padding: "16px",
+          boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
+        }}>
+          <h2 style={{ fontSize: "20px", fontWeight: "bold", marginBottom: "8px" }}>
+            Port: {proxy.port}
+          </h2>
+          <p>Status: {proxy.is_active ? "Active" : "Inactive"}</p>
+          <button
+            onClick={() => toggleProxy(proxy.id, proxy.is_active)}
+            style={{
+              marginTop: "10px",
+              padding: "8px 16px",
+              backgroundColor: "#333",
+              color: "#fff",
+              borderRadius: "8px",
+              cursor: "pointer"
+            }}
+          >
+            {proxy.is_active ? "Deactivate" : "Activate"}
+          </button>
+        </div>
       ))}
     </div>
   );
