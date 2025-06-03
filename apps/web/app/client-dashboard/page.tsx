@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFirestore, collection, query, where, getDocs } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
@@ -50,9 +49,12 @@ export default function ClientDashboard() {
           <CardContent className="p-4">
             <h2 className="text-xl font-bold mb-2">Port: {proxy.port}</h2>
             <p>Status: {proxy.is_active ? "Active" : "Inactive"}</p>
-            <Button onClick={() => toggleProxy(proxy.id, proxy.is_active)} className="mt-2">
+            <button
+              onClick={() => toggleProxy(proxy.id, proxy.is_active)}
+              style={{ padding: "8px 16px", borderRadius: "8px", backgroundColor: "#333", color: "#fff", marginTop: "8px" }}
+            >
               {proxy.is_active ? "Deactivate" : "Activate"}
-            </Button>
+            </button>
           </CardContent>
         </Card>
       ))}
