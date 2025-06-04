@@ -18,13 +18,15 @@ export default function ClientDashboard() {
 
   const fetchProxies = async (uid: string) => {
     setLoading(true);
+    console.log("📡 Fetching proxies for UID:", uid);
     try {
       const res = await axios.post("https://talmind-api-509546551316.me-west1.run.app/get-proxies", {
         uid,
       });
+      console.log("✅ API response:", res.data);
       setProxies(res.data.proxies || []);
     } catch (err) {
-      console.error("Error fetching proxies:", err);
+      console.error("❌ Error fetching proxies:", err);
     }
     setLoading(false);
   };
@@ -38,12 +40,13 @@ export default function ClientDashboard() {
       });
       if (uid) fetchProxies(uid);
     } catch (err) {
-      console.error("Error toggling proxy:", err);
+      console.error("❌ Error toggling proxy:", err);
     }
   };
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
+      console.log("👤 Firebase user:", user);
       if (user) {
         setUid(user.uid);
         fetchProxies(user.uid);
