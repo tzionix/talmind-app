@@ -2,73 +2,78 @@
 
 import { useEffect, useState } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { getFirestore, collection, query, where, getDocs } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "../../firebase.config";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import axios from "axios";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getFirestore(app);
 
 export default function ClientDashboard() {
   const [uid, setUid] = useState<string | null>(null);
   const [proxies, setProxies] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchProxies = async (uid: string) => {
+    setLoading(true);
+    try {
+      const res = await axios.post("https://talmind-api-509546551316.me-west1.run.app/get-proxies", {
+        uid,
+      });
+      setProxies(res.data.proxies || []);
+    } catch (err) {
+      console.error("Error fetching proxies:", err);
+    }
+    setLoading(false);
+  };
+
+  const toggleProxy = async (port: number, isActive: boolean) => {
+    try {
+      await axios.post("https://talmind-api-509546551316.me-west1.run.app/toggle-proxy", {
+        uid,
+        port,
+        is_active: !isActive,
+      });
+      if (uid) fetchProxies(uid);
+    } catch (err) {
+      console.error("Error toggling proxy:", err);
+    }
+  };
 
   useEffect(() => {
-    onAuthStateChanged(auth, async (user) => {
+    onAuthStateChanged(auth, (user) => {
       if (user) {
         setUid(user.uid);
-        const q = query(collection(db, "proxies"), where("uid", "==", user.uid));
-        const querySnapshot = await getDocs(q);
-        const proxyList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setProxies(proxyList);
-      } else {
-        setUid(null);
+        fetchProxies(user.uid);
       }
     });
   }, []);
 
-  const toggleProxy = async (proxyId: string, isActive: boolean) => {
-    await fetch("https://YOUR_API_DOMAIN/toggle-proxy", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ proxyId, isActive: !isActive }),
-    });
-    setProxies(prev =>
-      prev.map(p =>
-        p.id === proxyId ? { ...p, is_active: !isActive } : p
-      )
-    );
-  };
-
   return (
-    <div style={{ padding: "20px", display: "grid", gap: "20px" }}>
-      {proxies.map(proxy => (
-        <div key={proxy.id} style={{
-          border: "1px solid #ccc",
-          borderRadius: "16px",
-          padding: "16px",
-          boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
-        }}>
-          <h2 style={{ fontSize: "20px", fontWeight: "bold", marginBottom: "8px" }}>
-            Port: {proxy.port}
-          </h2>
-          <p>Status: {proxy.is_active ? "Active" : "Inactive"}</p>
-          <button
-            onClick={() => toggleProxy(proxy.id, proxy.is_active)}
-            style={{
-              marginTop: "10px",
-              padding: "8px 16px",
-              backgroundColor: "#333",
-              color: "#fff",
-              borderRadius: "8px",
-              cursor: "pointer"
-            }}
-          >
-            {proxy.is_active ? "Deactivate" : "Activate"}
-          </button>
-        </div>
-      ))}
+    <div className="p-6 grid gap-4">
+      <h1 className="text-2xl font-bold">Proxy Dashboard</h1>
+      {!uid && <p>Please sign in</p>}
+      {loading && <p>Loading proxies...</p>}
+      {!loading && proxies.length === 0 && <p>No proxies found.</p>}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {proxies.map((proxy, i) => (
+          <Card key={i} className="p-4">
+            <CardContent>
+              <p>Port: <b>{proxy.port}</b></p>
+              <p>IP: {proxy.ip || "N/A"}</p>
+              <p>Status: {proxy.is_active ? "Active" : "Inactive"}</p>
+              <Button
+                className="mt-2"
+                onClick={() => toggleProxy(proxy.port, proxy.is_active)}
+              >
+                {proxy.is_active ? "Deactivate" : "Activate"}
+              </Button>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
     </div>
   );
 }
