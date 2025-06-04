@@ -5,7 +5,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "../../firebase.config";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Button } from "../../../components/ui/button";
 import axios from "axios";
 
 const app = initializeApp(firebaseConfig);
