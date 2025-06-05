@@ -1,0 +1,325 @@
+diff --git a/apps/admin/.env b/apps/admin/.env
+index a79d7158e362789bb4f8345981fe82e0dedc0d12..6eb89ca3500cda3717cdd276ed4db91c827d027d 100644
+--- a/apps/admin/.env
++++ b/apps/admin/.env
+@@ -2,26 +2,35 @@
+ # HERE YOU CAN ADD ALL THE **PUBLIC** ENVIRONMENT VARIABLES THAT ARE SHARED ACROSS ALL THE ENVIROMENTS
+ # PLEASE DO NOT ADD ANY CONFIDENTIAL KEYS OR SENSITIVE INFORMATION HERE
+ # ONLY CONFIGURATION, PATH, FEATURE FLAGS, ETC.
+ # TO OVERRIDE THESE VARIABLES IN A SPECIFIC ENVIRONMENT, PLEASE ADD THEM TO THE SPECIFIC ENVIRONMENT FILE (e.g. .env.development, .env.production)
+ 
+ # SITE
+ NEXT_PUBLIC_SITE_URL=http://localhost:3000
+ NEXT_PUBLIC_PRODUCT_NAME=Makerkit
+ NEXT_PUBLIC_SITE_TITLE="Makerkit - The easiest way to build and manage your SaaS"
+ NEXT_PUBLIC_SITE_DESCRIPTION="Makerkit is the easiest way to build and manage your SaaS. It provides you with the tools you need to build your SaaS, without the hassle of building it from scratch."
+ NEXT_PUBLIC_DEFAULT_THEME_MODE=light
+ NEXT_PUBLIC_THEME_COLOR="#ffffff"
+ NEXT_PUBLIC_THEME_COLOR_DARK="#0a0a0a"
+ 
+ # AUTH
+ NEXT_PUBLIC_AUTH_PASSWORD=true
+ NEXT_PUBLIC_AUTH_MAGIC_LINK=false
+ NEXT_PUBLIC_CAPTCHA_SITE_KEY=
+ 
+ # LOCALES PATH
+ NEXT_PUBLIC_LOCALES_PATH=apps/web/public/locales
+ 
+ # FEATURE FLAGS
+ NEXT_PUBLIC_ENABLE_THEME_TOGGLE=true
+ NEXT_PUBLIC_LANGUAGE_PRIORITY=application
+-NEXT_PUBLIC_ENABLE_PERSONAL_ACCOUNT_DELETION=true
+\ No newline at end of file
++NEXT_PUBLIC_ENABLE_PERSONAL_ACCOUNT_DELETION=true
++
++# FIREBASE
++NEXT_PUBLIC_FIREBASE_API_KEY=
++NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
++NEXT_PUBLIC_FIREBASE_PROJECT_ID=
++NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
++NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
++NEXT_PUBLIC_FIREBASE_APP_ID=
++NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=
+diff --git a/apps/admin/.env.development b/apps/admin/.env.development
+index 479b56bd60ce81d689c00792b361e1420337b43b..2424c12836a746027437a7fdd2c275dcd2fb11bb 100644
+--- a/apps/admin/.env.development
++++ b/apps/admin/.env.development
+@@ -1,7 +1,16 @@
+ # This file is used to define environment variables for the development environment.
+ # These values are only used when running the app in development mode.
+ 
+ # SUPABASE
+ NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
+ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
+-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU
+\ No newline at end of file
++SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU
++
++# FIREBASE
++NEXT_PUBLIC_FIREBASE_API_KEY=
++NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
++NEXT_PUBLIC_FIREBASE_PROJECT_ID=
++NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
++NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
++NEXT_PUBLIC_FIREBASE_APP_ID=
++NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=
+diff --git a/apps/admin/.env.production b/apps/admin/.env.production
+index 0549b70d49bcc9b943cc1b0eef2f0e0b125c4d8b..3c845ff5adc54e406ac118fc967b442fe58ba1bc 100644
+--- a/apps/admin/.env.production
++++ b/apps/admin/.env.production
+@@ -1,8 +1,17 @@
+ # PRODUCTION ENVIRONMENT VARIABLES
+ 
+ ## DO NOT ADD VARS HERE UNLESS THEY ARE PUBLIC OR NOT SENSITIVE
+ ## THIS ENV IS USED FOR PRODUCTION AND IS COMMITED TO THE REPO
+ ## AVOID PLACING SENSITIVE DATA IN THIS FILE.
+ ## PUBLIC KEYS OR CONFIGURATION ARE OKAY TO BE PLACED HERE.
+ NEXT_PUBLIC_SUPABASE_URL=https://dummy.talmind.com
+-NEXT_PUBLIC_SUPABASE_ANON_KEY=dummy-key
+\ No newline at end of file
++NEXT_PUBLIC_SUPABASE_ANON_KEY=dummy-key
++
++# FIREBASE
++NEXT_PUBLIC_FIREBASE_API_KEY=
++NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
++NEXT_PUBLIC_FIREBASE_PROJECT_ID=
++NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
++NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
++NEXT_PUBLIC_FIREBASE_APP_ID=
++NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=
+diff --git a/apps/admin/.env.test b/apps/admin/.env.test
+index bab5aaaf87303dc304568465bf62232bb5368958..460b28cde9bc1e85d15576332f2d8c4b4408c117 100644
+--- a/apps/admin/.env.test
++++ b/apps/admin/.env.test
+@@ -1,15 +1,24 @@
+ # TEST ENVIRONMENT VARIABLES
+ NEXT_PUBLIC_CI=true
+ 
+ # SUPABASE
+ NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
+ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
+ 
+ EMAIL_SENDER=test@makerkit.dev
+ EMAIL_PORT=54325
+ EMAIL_HOST=localhost
+ EMAIL_TLS=false
+ EMAIL_USER=user
+ EMAIL_PASSWORD=password
+ 
+-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU
+\ No newline at end of file
++SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU
++
++# FIREBASE
++NEXT_PUBLIC_FIREBASE_API_KEY=
++NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
++NEXT_PUBLIC_FIREBASE_PROJECT_ID=
++NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
++NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
++NEXT_PUBLIC_FIREBASE_APP_ID=
++NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=
+diff --git a/apps/admin/README.md b/apps/admin/README.md
+index ec3c44234c8b910ee2802477c4527ab516f3d161..8f0b2f1684100c1c20ebc9525dc1f324031ce091 100644
+--- a/apps/admin/README.md
++++ b/apps/admin/README.md
+@@ -1,3 +1,16 @@
+ # Your Application
+ 
+ Write here everything about your application.
++
++## Environment Variables
++
++The application expects the following Firebase related variables to be defined
++in `.env` files:
++
++- `NEXT_PUBLIC_FIREBASE_API_KEY`
++- `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
++- `NEXT_PUBLIC_FIREBASE_PROJECT_ID`
++- `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`
++- `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`
++- `NEXT_PUBLIC_FIREBASE_APP_ID`
++- `NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID`
+diff --git a/apps/admin/firebase.config.ts b/apps/admin/firebase.config.ts
+index a60b19ab2831308df275cfaf3cb717994999791f..81f358023feacf464be4cb3c6a7be3ff8150d1c4 100644
+--- a/apps/admin/firebase.config.ts
++++ b/apps/admin/firebase.config.ts
+@@ -1,9 +1,9 @@
+ export const firebaseConfig = {
+-  apiKey: "AIzaSyAqbP-M11TU6PWsrABE4gFowU72UexKKjs",
+-  authDomain: "talmind-client.firebaseapp.com",
+-  projectId: "talmind-client",
+-  storageBucket: "talmind-client.firebasestorage.app",
+-  messagingSenderId: "392046515944",
+-  appId: "1:392046515944:web:26947feed2d80e28e01b5d",
+-  measurementId: "G-YTHEL7D5K8"
++  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
++  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
++  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
++  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
++  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
++  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
++  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
+ };
+diff --git a/apps/web/.env b/apps/web/.env
+index a79d7158e362789bb4f8345981fe82e0dedc0d12..6eb89ca3500cda3717cdd276ed4db91c827d027d 100644
+--- a/apps/web/.env
++++ b/apps/web/.env
+@@ -2,26 +2,35 @@
+ # HERE YOU CAN ADD ALL THE **PUBLIC** ENVIRONMENT VARIABLES THAT ARE SHARED ACROSS ALL THE ENVIROMENTS
+ # PLEASE DO NOT ADD ANY CONFIDENTIAL KEYS OR SENSITIVE INFORMATION HERE
+ # ONLY CONFIGURATION, PATH, FEATURE FLAGS, ETC.
+ # TO OVERRIDE THESE VARIABLES IN A SPECIFIC ENVIRONMENT, PLEASE ADD THEM TO THE SPECIFIC ENVIRONMENT FILE (e.g. .env.development, .env.production)
+ 
+ # SITE
+ NEXT_PUBLIC_SITE_URL=http://localhost:3000
+ NEXT_PUBLIC_PRODUCT_NAME=Makerkit
+ NEXT_PUBLIC_SITE_TITLE="Makerkit - The easiest way to build and manage your SaaS"
+ NEXT_PUBLIC_SITE_DESCRIPTION="Makerkit is the easiest way to build and manage your SaaS. It provides you with the tools you need to build your SaaS, without the hassle of building it from scratch."
+ NEXT_PUBLIC_DEFAULT_THEME_MODE=light
+ NEXT_PUBLIC_THEME_COLOR="#ffffff"
+ NEXT_PUBLIC_THEME_COLOR_DARK="#0a0a0a"
+ 
+ # AUTH
+ NEXT_PUBLIC_AUTH_PASSWORD=true
+ NEXT_PUBLIC_AUTH_MAGIC_LINK=false
+ NEXT_PUBLIC_CAPTCHA_SITE_KEY=
+ 
+ # LOCALES PATH
+ NEXT_PUBLIC_LOCALES_PATH=apps/web/public/locales
+ 
+ # FEATURE FLAGS
+ NEXT_PUBLIC_ENABLE_THEME_TOGGLE=true
+ NEXT_PUBLIC_LANGUAGE_PRIORITY=application
+-NEXT_PUBLIC_ENABLE_PERSONAL_ACCOUNT_DELETION=true
+\ No newline at end of file
++NEXT_PUBLIC_ENABLE_PERSONAL_ACCOUNT_DELETION=true
++
++# FIREBASE
++NEXT_PUBLIC_FIREBASE_API_KEY=
++NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
++NEXT_PUBLIC_FIREBASE_PROJECT_ID=
++NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
++NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
++NEXT_PUBLIC_FIREBASE_APP_ID=
++NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=
+diff --git a/apps/web/.env.development b/apps/web/.env.development
+index 479b56bd60ce81d689c00792b361e1420337b43b..2424c12836a746027437a7fdd2c275dcd2fb11bb 100644
+--- a/apps/web/.env.development
++++ b/apps/web/.env.development
+@@ -1,7 +1,16 @@
+ # This file is used to define environment variables for the development environment.
+ # These values are only used when running the app in development mode.
+ 
+ # SUPABASE
+ NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
+ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
+-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU
+\ No newline at end of file
++SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU
++
++# FIREBASE
++NEXT_PUBLIC_FIREBASE_API_KEY=
++NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
++NEXT_PUBLIC_FIREBASE_PROJECT_ID=
++NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
++NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
++NEXT_PUBLIC_FIREBASE_APP_ID=
++NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=
+diff --git a/apps/web/.env.production b/apps/web/.env.production
+index 805e35bdd93f52abf69a3e6ecaf4fd14c91b1d5b..d7c8eb487831ddb380f966053a3c0f54e3fe8a89 100644
+--- a/apps/web/.env.production
++++ b/apps/web/.env.production
+@@ -1,9 +1,18 @@
+ # PRODUCTION ENVIRONMENT VARIABLES
+ 
+ ## DO NOT ADD VARS HERE UNLESS THEY ARE PUBLIC OR NOT SENSITIVE
+ ## THIS ENV IS USED FOR PRODUCTION AND IS COMMITED TO THE REPO
+ ## AVOID PLACING SENSITIVE DATA IN THIS FILE.
+ ## PUBLIC KEYS OR CONFIGURATION ARE OKAY TO BE PLACED HERE.
+ 
+ # SUPABASE
+-NEXT_PUBLIC_SUPABASE_URL=
+\ No newline at end of file
++NEXT_PUBLIC_SUPABASE_URL=
++
++# FIREBASE
++NEXT_PUBLIC_FIREBASE_API_KEY=
++NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
++NEXT_PUBLIC_FIREBASE_PROJECT_ID=
++NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
++NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
++NEXT_PUBLIC_FIREBASE_APP_ID=
++NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=
+diff --git a/apps/web/.env.test b/apps/web/.env.test
+index bab5aaaf87303dc304568465bf62232bb5368958..460b28cde9bc1e85d15576332f2d8c4b4408c117 100644
+--- a/apps/web/.env.test
++++ b/apps/web/.env.test
+@@ -1,15 +1,24 @@
+ # TEST ENVIRONMENT VARIABLES
+ NEXT_PUBLIC_CI=true
+ 
+ # SUPABASE
+ NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
+ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
+ 
+ EMAIL_SENDER=test@makerkit.dev
+ EMAIL_PORT=54325
+ EMAIL_HOST=localhost
+ EMAIL_TLS=false
+ EMAIL_USER=user
+ EMAIL_PASSWORD=password
+ 
+-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU
+\ No newline at end of file
++SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU
++
++# FIREBASE
++NEXT_PUBLIC_FIREBASE_API_KEY=
++NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
++NEXT_PUBLIC_FIREBASE_PROJECT_ID=
++NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
++NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
++NEXT_PUBLIC_FIREBASE_APP_ID=
++NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=
+diff --git a/apps/web/README.md b/apps/web/README.md
+index a89a753983b5d1101dbb7d793f6a1321ce168b80..3d58ce3f9025ab35c9b62902d9a9f260d836ff9b 100644
+--- a/apps/web/README.md
++++ b/apps/web/README.md
+@@ -1,3 +1,16 @@
+ # Your Application
+ 
+ Write here everything about your application
++
++## Environment Variables
++
++The application expects the following Firebase related variables to be defined
++in `.env` files:
++
++- `NEXT_PUBLIC_FIREBASE_API_KEY`
++- `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
++- `NEXT_PUBLIC_FIREBASE_PROJECT_ID`
++- `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`
++- `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`
++- `NEXT_PUBLIC_FIREBASE_APP_ID`
++- `NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID`
+diff --git a/apps/web/firebase.config.ts b/apps/web/firebase.config.ts
+index a60b19ab2831308df275cfaf3cb717994999791f..81f358023feacf464be4cb3c6a7be3ff8150d1c4 100644
+--- a/apps/web/firebase.config.ts
++++ b/apps/web/firebase.config.ts
+@@ -1,9 +1,9 @@
+ export const firebaseConfig = {
+-  apiKey: "AIzaSyAqbP-M11TU6PWsrABE4gFowU72UexKKjs",
+-  authDomain: "talmind-client.firebaseapp.com",
+-  projectId: "talmind-client",
+-  storageBucket: "talmind-client.firebasestorage.app",
+-  messagingSenderId: "392046515944",
+-  appId: "1:392046515944:web:26947feed2d80e28e01b5d",
+-  measurementId: "G-YTHEL7D5K8"
++  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
++  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
++  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
++  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
++  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
++  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
++  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
+ };
