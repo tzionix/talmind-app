@@ -1,520 +1,67 @@
-diff --git a/apps/admin/app/api/get-proxies/route.test.ts b/apps/admin/app/api/get-proxies/route.test.ts
-new file mode 100644
-index 0000000000000000000000000000000000000000..742a96324ab26103ff50f5db2a938e856aa76f86
---- /dev/null
-+++ b/apps/admin/app/api/get-proxies/route.test.ts
-@@ -0,0 +1,7 @@
-+import { test } from 'node:test';
-+import assert from 'node:assert';
-+import { POST } from './route';
-+
-+test('get-proxies POST handler exists', () => {
-+  assert.strictEqual(typeof POST, 'function');
-+});
-diff --git a/apps/admin/app/api/get-proxies/route.ts b/apps/admin/app/api/get-proxies/route.ts
-new file mode 100644
-index 0000000000000000000000000000000000000000..bcc3b7da35e8810ac2c3049e8ab86b015becbc23
---- /dev/null
-+++ b/apps/admin/app/api/get-proxies/route.ts
-@@ -0,0 +1,11 @@
-+import { NextRequest, NextResponse } from 'next/server';
-+import { firebaseConfig } from '~/firebase.config';
-+import { initFirebase, getProxies } from '@kit/proxies/proxies';
-+
-+initFirebase(firebaseConfig);
-+
-+export async function POST(request: NextRequest) {
-+  const { uid } = await request.json();
-+  const data = await getProxies(uid);
-+  return NextResponse.json(data);
-+}
-diff --git a/apps/admin/app/api/toggle-proxy/route.test.ts b/apps/admin/app/api/toggle-proxy/route.test.ts
-new file mode 100644
-index 0000000000000000000000000000000000000000..bc33b3fd397c2d6de2c7d36b416c80bcd9d4dec9
---- /dev/null
-+++ b/apps/admin/app/api/toggle-proxy/route.test.ts
-@@ -0,0 +1,7 @@
-+import { test } from 'node:test';
-+import assert from 'node:assert';
-+import { POST } from './route';
-+
-+test('toggle-proxy POST handler exists', () => {
-+  assert.strictEqual(typeof POST, 'function');
-+});
-diff --git a/apps/admin/app/api/toggle-proxy/route.ts b/apps/admin/app/api/toggle-proxy/route.ts
-new file mode 100644
-index 0000000000000000000000000000000000000000..519b5fa2d8a4569f64ce218e3d1244536897ff03
---- /dev/null
-+++ b/apps/admin/app/api/toggle-proxy/route.ts
-@@ -0,0 +1,11 @@
-+import { NextRequest, NextResponse } from 'next/server';
-+import { firebaseConfig } from '~/firebase.config';
-+import { initFirebase, toggleProxy } from '@kit/proxies/proxies';
-+
-+initFirebase(firebaseConfig);
-+
-+export async function POST(request: NextRequest) {
-+  const { id, value } = await request.json();
-+  await toggleProxy(id, value);
-+  return NextResponse.json({ success: true });
-+}
-diff --git a/apps/admin/app/client-dashboard/ClientDashboard.tsx b/apps/admin/app/client-dashboard/ClientDashboard.tsx
-new file mode 100644
-index 0000000000000000000000000000000000000000..efef75835e1426711e873c52a998a91035fa4858
---- /dev/null
-+++ b/apps/admin/app/client-dashboard/ClientDashboard.tsx
-@@ -0,0 +1,98 @@
-+"use client";
-+
-+import { useEffect, useState } from 'react';
-+import {
-+  getAuth,
-+  onAuthStateChanged,
-+  signInWithEmailAndPassword,
-+} from 'firebase/auth';
-+import { initializeApp } from 'firebase/app';
-+import { firebaseConfig } from '../../firebase.config';
-+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@kit/ui/table';
-+import { Button } from '@kit/ui/button';
-+import { useProxies } from '@kit/proxies/hooks/useProxies';
-+
-+const app = initializeApp(firebaseConfig);
-+const auth = getAuth(app);
-+
-+export default function ClientDashboard() {
-+  const [uid, setUid] = useState<string | null>(null);
-+  const [email, setEmail] = useState("");
-+  const [password, setPassword] = useState("");
-+  const [error, setError] = useState<string | null>(null);
-+
-+  useEffect(() => {
-+    onAuthStateChanged(auth, (user) => {
-+      if (user) setUid(user.uid);
-+    });
-+  }, []);
-+
-+  const handleLogin = async () => {
-+    try {
-+      const result = await signInWithEmailAndPassword(auth, email, password);
-+      setUid(result.user.uid);
-+      setError(null);
-+    } catch (err: any) {
-+      setError(err.message);
-+    }
-+  };
-+
-+  if (!uid) {
-+    return (
-+      <div className="p-6">
-+        <h1 className="text-2xl font-bold mb-4">Login</h1>
-+        <input
-+          type="email"
-+          placeholder="Email"
-+          className="block mb-2 p-2 border rounded"
-+          value={email}
-+          onChange={(e) => setEmail(e.target.value)}
-+        />
-+        <input
-+          type="password"
-+          placeholder="Password"
-+          className="block mb-2 p-2 border rounded"
-+          value={password}
-+          onChange={(e) => setPassword(e.target.value)}
-+        />
-+        <button
-+          onClick={handleLogin}
-+          className="bg-blue-500 text-white px-4 py-2 rounded"
-+        >
-+          Login
-+        </button>
-+        {error && <p className="text-red-500 mt-2">{error}</p>}
-+      </div>
-+    );
-+  }
-+
-+  const { data: proxies, toggleProxy } = useProxies(uid);
-+
-+  return (
-+    <div className="p-4">
-+      <h1 className="text-xl font-bold mb-4">Proxies</h1>
-+      <Table>
-+        <TableHeader>
-+          <TableRow>
-+            <TableHead>Port</TableHead>
-+            <TableHead>Status</TableHead>
-+            <TableHead></TableHead>
-+          </TableRow>
-+        </TableHeader>
-+        <TableBody>
-+          {proxies.map((proxy) => (
-+            <TableRow key={proxy.id}>
-+              <TableCell>{proxy.port}</TableCell>
-+              <TableCell>{proxy.is_active ? 'ON' : 'OFF'}</TableCell>
-+              <TableCell>
-+                <Button onClick={() => toggleProxy(proxy.id, proxy.is_active)}>
-+                  {proxy.is_active ? 'Deactivate' : 'Activate'}
-+                </Button>
-+              </TableCell>
-+            </TableRow>
-+          ))}
-+        </TableBody>
-+      </Table>
-+    </div>
-+  );
-+}
-diff --git a/apps/admin/app/client-dashboard/page.tsx b/apps/admin/app/client-dashboard/page.tsx
-new file mode 100644
-index 0000000000000000000000000000000000000000..2089570cc8bd95f7e9d1423bc444c63e852c2368
---- /dev/null
-+++ b/apps/admin/app/client-dashboard/page.tsx
-@@ -0,0 +1,5 @@
-+import ClientDashboard from './ClientDashboard';
-+
-+export default function Page() {
-+  return <ClientDashboard />;
-+}
-diff --git a/apps/admin/firebase.config.ts b/apps/admin/firebase.config.ts
-new file mode 100644
-index 0000000000000000000000000000000000000000..a60b19ab2831308df275cfaf3cb717994999791f
---- /dev/null
-+++ b/apps/admin/firebase.config.ts
-@@ -0,0 +1,9 @@
-+export const firebaseConfig = {
-+  apiKey: "AIzaSyAqbP-M11TU6PWsrABE4gFowU72UexKKjs",
-+  authDomain: "talmind-client.firebaseapp.com",
-+  projectId: "talmind-client",
-+  storageBucket: "talmind-client.firebasestorage.app",
-+  messagingSenderId: "392046515944",
-+  appId: "1:392046515944:web:26947feed2d80e28e01b5d",
-+  measurementId: "G-YTHEL7D5K8"
-+};
-diff --git a/apps/web/app/api/get-proxies/route.test.ts b/apps/web/app/api/get-proxies/route.test.ts
-new file mode 100644
-index 0000000000000000000000000000000000000000..742a96324ab26103ff50f5db2a938e856aa76f86
---- /dev/null
-+++ b/apps/web/app/api/get-proxies/route.test.ts
-@@ -0,0 +1,7 @@
-+import { test } from 'node:test';
-+import assert from 'node:assert';
-+import { POST } from './route';
-+
-+test('get-proxies POST handler exists', () => {
-+  assert.strictEqual(typeof POST, 'function');
-+});
-diff --git a/apps/web/app/api/get-proxies/route.ts b/apps/web/app/api/get-proxies/route.ts
-new file mode 100644
-index 0000000000000000000000000000000000000000..bcc3b7da35e8810ac2c3049e8ab86b015becbc23
---- /dev/null
-+++ b/apps/web/app/api/get-proxies/route.ts
-@@ -0,0 +1,11 @@
-+import { NextRequest, NextResponse } from 'next/server';
-+import { firebaseConfig } from '~/firebase.config';
-+import { initFirebase, getProxies } from '@kit/proxies/proxies';
-+
-+initFirebase(firebaseConfig);
-+
-+export async function POST(request: NextRequest) {
-+  const { uid } = await request.json();
-+  const data = await getProxies(uid);
-+  return NextResponse.json(data);
-+}
-diff --git a/apps/web/app/api/toggle-proxy/route.test.ts b/apps/web/app/api/toggle-proxy/route.test.ts
-new file mode 100644
-index 0000000000000000000000000000000000000000..bc33b3fd397c2d6de2c7d36b416c80bcd9d4dec9
---- /dev/null
-+++ b/apps/web/app/api/toggle-proxy/route.test.ts
-@@ -0,0 +1,7 @@
-+import { test } from 'node:test';
-+import assert from 'node:assert';
-+import { POST } from './route';
-+
-+test('toggle-proxy POST handler exists', () => {
-+  assert.strictEqual(typeof POST, 'function');
-+});
-diff --git a/apps/web/app/api/toggle-proxy/route.ts b/apps/web/app/api/toggle-proxy/route.ts
-new file mode 100644
-index 0000000000000000000000000000000000000000..519b5fa2d8a4569f64ce218e3d1244536897ff03
---- /dev/null
-+++ b/apps/web/app/api/toggle-proxy/route.ts
-@@ -0,0 +1,11 @@
-+import { NextRequest, NextResponse } from 'next/server';
-+import { firebaseConfig } from '~/firebase.config';
-+import { initFirebase, toggleProxy } from '@kit/proxies/proxies';
-+
-+initFirebase(firebaseConfig);
-+
-+export async function POST(request: NextRequest) {
-+  const { id, value } = await request.json();
-+  await toggleProxy(id, value);
-+  return NextResponse.json({ success: true });
-+}
-diff --git a/apps/web/app/client-dashboard/ClientDashboard.tsx b/apps/web/app/client-dashboard/ClientDashboard.tsx
-index f5b004e8d0b1a5b0a10b9a96074de011b8945df0..80200115e0923a0bbef1c27a3a39fb74dd730531 100644
---- a/apps/web/app/client-dashboard/ClientDashboard.tsx
-+++ b/apps/web/app/client-dashboard/ClientDashboard.tsx
-@@ -1,58 +1,98 @@
- "use client";
- 
+diff --git a/apps/client-dashboard.tsx b/apps/client-dashboard.tsx
+deleted file mode 100644
+index da65b29885947424c052e72f135aac41747ee73c..0000000000000000000000000000000000000000
+--- a/apps/client-dashboard.tsx
++++ /dev/null
+@@ -1,61 +0,0 @@
+-"use client";
+-
 -import { useEffect, useState } from "react";
--import { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
+-import { Card, CardContent } from "@/components/ui/card";
+-import { Button } from "@/components/ui/button";
+-import { getAuth, onAuthStateChanged } from "firebase/auth";
+-import { getFirestore, collection, query, where, getDocs } from "firebase/firestore";
 -import { initializeApp } from "firebase/app";
 -import { firebaseConfig } from "../../firebase.config";
-+import { useEffect, useState } from 'react';
-+import {
-+  getAuth,
-+  onAuthStateChanged,
-+  signInWithEmailAndPassword,
-+} from 'firebase/auth';
-+import { initializeApp } from 'firebase/app';
-+import { firebaseConfig } from '../../firebase.config';
-+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@kit/ui/table';
-+import { Button } from '@/components/ui/button';
-+import { useProxies } from '@kit/proxies/hooks/useProxies';
- 
- const app = initializeApp(firebaseConfig);
- const auth = getAuth(app);
- 
- export default function ClientDashboard() {
-   const [uid, setUid] = useState<string | null>(null);
-   const [email, setEmail] = useState("");
-   const [password, setPassword] = useState("");
-   const [error, setError] = useState<string | null>(null);
- 
-   useEffect(() => {
-     onAuthStateChanged(auth, (user) => {
-       if (user) setUid(user.uid);
-     });
-   }, []);
- 
-   const handleLogin = async () => {
-     try {
-       const result = await signInWithEmailAndPassword(auth, email, password);
-       setUid(result.user.uid);
-       setError(null);
-     } catch (err: any) {
-       setError(err.message);
-     }
-   };
- 
-   if (!uid) {
-     return (
-       <div className="p-6">
-         <h1 className="text-2xl font-bold mb-4">Login</h1>
-         <input
-           type="email"
-           placeholder="Email"
-           className="block mb-2 p-2 border rounded"
-           value={email}
-           onChange={(e) => setEmail(e.target.value)}
-         />
-         <input
-           type="password"
-           placeholder="Password"
-           className="block mb-2 p-2 border rounded"
-           value={password}
-           onChange={(e) => setPassword(e.target.value)}
-         />
--        <button onClick={handleLogin} className="bg-blue-500 text-white px-4 py-2 rounded">Login</button>
-+        <button
-+          onClick={handleLogin}
-+          className="bg-blue-500 text-white px-4 py-2 rounded"
-+        >
-+          Login
-+        </button>
-         {error && <p className="text-red-500 mt-2">{error}</p>}
-       </div>
-     );
-   }
- 
--  return <p>🔓 Logged in as {uid}</p>;
-+  const { data: proxies, toggleProxy } = useProxies(uid);
-+
-+  return (
-+    <div className="p-4">
-+      <h1 className="text-xl font-bold mb-4">Proxies</h1>
-+      <Table>
-+        <TableHeader>
-+          <TableRow>
-+            <TableHead>Port</TableHead>
-+            <TableHead>Status</TableHead>
-+            <TableHead></TableHead>
-+          </TableRow>
-+        </TableHeader>
-+        <TableBody>
-+          {proxies.map((proxy) => (
-+            <TableRow key={proxy.id}>
-+              <TableCell>{proxy.port}</TableCell>
-+              <TableCell>{proxy.is_active ? 'ON' : 'OFF'}</TableCell>
-+              <TableCell>
-+                <Button onClick={() => toggleProxy(proxy.id, proxy.is_active)}>
-+                  {proxy.is_active ? 'Deactivate' : 'Activate'}
-+                </Button>
-+              </TableCell>
-+            </TableRow>
-+          ))}
-+        </TableBody>
-+      </Table>
-+    </div>
-+  );
- }
-diff --git a/packages/features/proxies/eslint.config.mjs b/packages/features/proxies/eslint.config.mjs
-new file mode 100644
-index 0000000000000000000000000000000000000000..97563ae8d570c30a0f62517650360245166285f2
---- /dev/null
-+++ b/packages/features/proxies/eslint.config.mjs
-@@ -0,0 +1,3 @@
-+import eslintConfigBase from '@kit/eslint-config/base.js';
-+
-+export default eslintConfigBase;
-diff --git a/packages/features/proxies/hooks/useProxies.test.ts b/packages/features/proxies/hooks/useProxies.test.ts
-new file mode 100644
-index 0000000000000000000000000000000000000000..738e59dc54773af71a0cfd5e97e8ea56b6d23f10
---- /dev/null
-+++ b/packages/features/proxies/hooks/useProxies.test.ts
-@@ -0,0 +1,10 @@
-+import { test } from 'node:test';
-+import assert from 'node:assert';
-+
-+import { useProxies } from './useProxies';
-+
-+// Basic smoke test to ensure the hook is defined
-+
-+test('useProxies is a function', () => {
-+  assert.strictEqual(typeof useProxies, 'function');
-+});
-diff --git a/packages/features/proxies/hooks/useProxies.ts b/packages/features/proxies/hooks/useProxies.ts
-new file mode 100644
-index 0000000000000000000000000000000000000000..43bf86c42569d6ea3a188458ebe9a9bf1d5609f7
---- /dev/null
-+++ b/packages/features/proxies/hooks/useProxies.ts
-@@ -0,0 +1,36 @@
-+'use client';
-+
-+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-+import { getProxies, toggleProxy } from '../proxies';
-+
-+export function useProxies(uid?: string | null) {
-+  const queryClient = useQueryClient();
-+
-+  const query = useQuery({
-+    queryKey: ['proxies', uid],
-+    queryFn: () => (uid ? getProxies(uid) : []),
-+    enabled: !!uid,
-+  });
-+
-+  const mutation = useMutation({
-+    mutationFn: ({ id, value }: { id: string; value: boolean }) =>
-+      toggleProxy(id, value),
-+    onSuccess: (_data, variables) => {
-+      queryClient.setQueryData<any[]>(['proxies', uid], (old) =>
-+        old?.map((p) =>
-+          p.id === variables.id ? { ...p, is_active: variables.value } : p,
-+        ) ?? [],
-+      );
-+    },
-+  });
-+
-+  const handleToggle = (id: string, current: boolean) => {
-+    mutation.mutate({ id, value: !current });
-+  };
-+
-+  return {
-+    data: query.data ?? [],
-+    isLoading: query.isLoading,
-+    toggleProxy: handleToggle,
-+  };
-+}
-diff --git a/packages/features/proxies/package.json b/packages/features/proxies/package.json
-new file mode 100644
-index 0000000000000000000000000000000000000000..2c55bcca10fc5db7c24347849f8bbd5562cea9c9
---- /dev/null
-+++ b/packages/features/proxies/package.json
-@@ -0,0 +1,31 @@
-+{
-+  "name": "@kit/proxies",
-+  "private": true,
-+  "version": "0.1.0",
-+  "scripts": {
-+    "clean": "git clean -xdf .turbo node_modules",
-+    "format": "prettier --check \"**/*.{ts,tsx}\"",
-+    "lint": "eslint .",
-+    "typecheck": "tsc --noEmit"
-+  },
-+  "exports": {
-+    "./proxies": "./proxies.ts",
-+    "./hooks/*": "./hooks/*.ts"
-+  },
-+  "devDependencies": {
-+    "@kit/eslint-config": "workspace:*",
-+    "@kit/prettier-config": "workspace:*",
-+    "@kit/tsconfig": "workspace:*",
-+    "@tanstack/react-query": "5.64.1",
-+    "firebase": "^11.8.1",
-+    "react": "19.0.0"
-+  },
-+  "prettier": "@kit/prettier-config",
-+  "typesVersions": {
-+    "*": {
-+      "*": [
-+        "./*"
-+      ]
-+    }
-+  }
-+}
-diff --git a/packages/features/proxies/proxies.ts b/packages/features/proxies/proxies.ts
-new file mode 100644
-index 0000000000000000000000000000000000000000..f1a545dbfda9f9660dc335bfde7afd693081578e
---- /dev/null
-+++ b/packages/features/proxies/proxies.ts
-@@ -0,0 +1,37 @@
-+import { initializeApp, getApps, getApp, type FirebaseApp } from 'firebase/app';
-+import {
-+  getFirestore,
-+  collection,
-+  query,
-+  where,
-+  getDocs,
-+  doc,
-+  updateDoc,
-+  type Firestore,
-+} from 'firebase/firestore';
-+
-+let app: FirebaseApp | undefined;
-+let db: Firestore | undefined;
-+
-+export function initFirebase(config: object) {
-+  if (!getApps().length) {
-+    app = initializeApp(config);
-+  } else {
-+    app = getApp();
-+  }
-+  db = getFirestore(app);
-+  return db;
-+}
-+
-+export async function getProxies(uid: string) {
-+  if (!db) throw new Error('Firestore not initialized');
-+  const q = query(collection(db, 'proxies'), where('uid', '==', uid));
-+  const snap = await getDocs(q);
-+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-+}
-+
-+export async function toggleProxy(id: string, value: boolean) {
-+  if (!db) throw new Error('Firestore not initialized');
-+  const ref = doc(db, 'proxies', id);
-+  await updateDoc(ref, { is_active: value });
-+}
-diff --git a/packages/features/proxies/tsconfig.json b/packages/features/proxies/tsconfig.json
-new file mode 100644
-index 0000000000000000000000000000000000000000..39384dac56d94ccef2e9bdddb7103a63a3eec3e4
---- /dev/null
-+++ b/packages/features/proxies/tsconfig.json
-@@ -0,0 +1,8 @@
-+{
-+  "extends": "@kit/tsconfig/base.json",
-+  "compilerOptions": {
-+    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json"
-+  },
-+  "include": ["*.ts", "hooks/*.ts"],
-+  "exclude": ["node_modules"]
-+}
+-
+-const app = initializeApp(firebaseConfig);
+-const auth = getAuth(app);
+-const db = getFirestore(app);
+-
+-export default function ClientDashboard() {
+-  const [uid, setUid] = useState<string | null>(null);
+-  const [proxies, setProxies] = useState<any[]>([]);
+-
+-  useEffect(() => {
+-    onAuthStateChanged(auth, async (user) => {
+-      if (user) {
+-        setUid(user.uid);
+-        const q = query(collection(db, "proxies"), where("uid", "==", user.uid));
+-        const querySnapshot = await getDocs(q);
+-        const proxyList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+-        setProxies(proxyList);
+-      } else {
+-        setUid(null);
+-      }
+-    });
+-  }, []);
+-
+-  const toggleProxy = async (proxyId: string, isActive: boolean) => {
+-    await fetch("https://YOUR_API_DOMAIN/toggle-proxy", {
+-      method: "POST",
+-      headers: { "Content-Type": "application/json" },
+-      body: JSON.stringify({ proxyId, isActive: !isActive }),
+-    });
+-    setProxies(prev =>
+-      prev.map(p =>
+-        p.id === proxyId ? { ...p, is_active: !isActive } : p
+-      )
+-    );
+-  };
+-
+-  return (
+-    <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+-      {proxies.map(proxy => (
+-        <Card key={proxy.id} className="rounded-2xl shadow-md">
+-          <CardContent className="p-4">
+-            <h2 className="text-xl font-bold mb-2">Port: {proxy.port}</h2>
+-            <p>Status: {proxy.is_active ? "Active" : "Inactive"}</p>
+-            <Button onClick={() => toggleProxy(proxy.id, proxy.is_active)} className="mt-2">
+-              {proxy.is_active ? "Deactivate" : "Activate"}
+-            </Button>
+-          </CardContent>
+-        </Card>
+-      ))}
+-    </div>
+-  );
+-}
