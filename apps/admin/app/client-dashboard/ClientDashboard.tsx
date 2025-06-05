@@ -9,7 +9,7 @@ import {
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../../firebase.config';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@kit/ui/table';
-import { Button } from '@/components/ui/button';
+import { Button } from '@kit/ui/button';
 import { useProxies } from '@kit/proxies/hooks/useProxies';
 
 const app = initializeApp(firebaseConfig);

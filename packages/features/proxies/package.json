@@ -1,0 +1,31 @@
+{
+  "name": "@kit/proxies",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "clean": "git clean -xdf .turbo node_modules",
+    "format": "prettier --check \"**/*.{ts,tsx}\"",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "exports": {
+    "./proxies": "./proxies.ts",
+    "./hooks/*": "./hooks/*.ts"
+  },
+  "devDependencies": {
+    "@kit/eslint-config": "workspace:*",
+    "@kit/prettier-config": "workspace:*",
+    "@kit/tsconfig": "workspace:*",
+    "@tanstack/react-query": "5.64.1",
+    "firebase": "^11.8.1",
+    "react": "19.0.0"
+  },
+  "prettier": "@kit/prettier-config",
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./*"
+      ]
+    }
+  }
+}
